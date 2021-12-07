@@ -137,7 +137,7 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
           } else {
             throw Error(error?.response?.data?.error);
           }
-        console.log('request', error.request);
+        // console.log('request', error.request);
         throw error;
       }
     );
@@ -486,10 +486,22 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
     return result.data.localMessage as string;
   }
 
+  /** Gửi Yêu cầu chi */
   async submitPayoutList(fileId: string) {
     const result = await this._api({
       method: 'post',
       url: '/api/services/salary/v1/payout/submit',
+      headers: { ...(await this.tokenHeader()) },
+      data: JSON.stringify({ requestId: Date.now(), fileId }),
+    });
+    return result.data.localMessage as string;
+  }
+
+  /** Duyêt yêu cầu chi  */
+  async approvePayoutList(fileId: string) {
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/payout/approve',
       headers: { ...(await this.tokenHeader()) },
       data: JSON.stringify({ requestId: Date.now(), fileId }),
     });

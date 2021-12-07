@@ -2,8 +2,14 @@ import MomoSalary from '../src';
 
 export const momoSalary = new MomoSalary({
   mode: 'test',
-  username: process.env.USERNAME || 'test-salary',
-  password: process.env.PASSWORD || '12345678',
+  username: 'test-salary',
+  password: '12345678',
+});
+
+export const momoSalary2 = new MomoSalary({
+  mode: 'test',
+  username: 'test-salary2',
+  password: '12345678',
 });
 
 export function waitForReady(momo: MomoSalary) {
