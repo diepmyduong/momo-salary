@@ -13,6 +13,13 @@ type Config = {
   mode?: 'test' | 'prod';
 };
 
+type DeliveryFile = {
+  createdAt: string;
+  fileId: string;
+  fileName: string;
+  partnerId: string;
+};
+
 export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
   private _api: AxiosInstance;
   private _token: string = '';
@@ -79,12 +86,21 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       url: '/api/services/salary/v1/balance',
       headers: {
         ...(await this.tokenHeader()),
-        Referer:
-          'https://test-business.momo.vn/v2/portal/salary/payout-management',
-        'Content-Type': 'application/json;charset=UTF-8',
       },
       data: JSON.stringify({ requestId: Date.now() }),
     });
     return result.data.data.amount;
+  }
+
+  async getAllDeliveryFiles() {
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/delivery/file',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({ requestId: Date.now() }),
+    });
+    return result.data.data as DeliveryFile[];
   }
 }
