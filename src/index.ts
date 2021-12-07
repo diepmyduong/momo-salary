@@ -209,4 +209,30 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       uiMessage: string;
     };
   }
+
+  /**
+   * Tải file báo cáo danh sách người nhận
+   */
+  async getDeliveryListReport(params: {
+    fileId: string;
+    idNumber?: string;
+    phoneNumber?: string;
+    status?: DeliveryStatus;
+  }) {
+    const { fileId, idNumber = '', phoneNumber = '', status = -1 } = params;
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/delivery/list/report/excel',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({
+        fileId,
+        idNumber,
+        phoneNumber,
+        status,
+      }),
+    });
+    return result.data.fileUrl as string;
+  }
 }
