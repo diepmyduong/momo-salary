@@ -236,6 +236,10 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
     return result.data.fileUrl as string;
   }
 
+  /**
+   * Kiểm tra lại trạng thái ví của dữ liệu
+   * @param fileId Mã file
+   */
   async recheckDeliveryList(fileId: string) {
     const result = await this._api({
       method: 'post',
@@ -249,5 +253,55 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       }),
     });
     return result.data.localMessage as string;
+  }
+
+  /**
+   * Upload file danh sách giải ngân
+   * @param file path của file danh sách giải ngân
+   * @param name Tên file được lưu lại
+   * @returns Trả về fileId
+   */
+  async uploadPayoutList(file: string, name: string) {
+    var data = new FormData();
+    data.append('requestId', Date.now());
+    data.append('file', fs.createReadStream(file));
+    data.append('name', name);
+    const concatenated = await concatBuffer(data);
+
+    return await this._api({
+      method: 'post',
+      url: `/api/services/salary/v1/payout/upload`,
+      headers: {
+        ...(await this.tokenHeader()),
+        ...data.getHeaders(),
+      },
+      data: concatenated,
+    }).then(
+      res =>
+        res.data.data as { fileId: string; total: number; totalSuccess: number }
+    );
+  }
+
+  /**
+   * Kiểm tra trạng thái upload danh sách giải ngân
+   * @param fileId Id file
+   * @returns resultCode = 0 là thành công
+   */
+  async getPayoutFileStatus(fileId: string) {
+    const result = await this._api({
+      method: 'get',
+      url: '/api/services/salary/v1/payout/status',
+      params: { fileId },
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+    });
+    return result.data as {
+      localMessage: string;
+      message: string;
+      referenceId: string;
+      resultCode: number;
+      uiMessage: string;
+    };
   }
 }
