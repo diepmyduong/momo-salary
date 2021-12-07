@@ -485,4 +485,14 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
     });
     return result.data.localMessage as string;
   }
+
+  async submitPayoutList(fileId: string) {
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/payout/submit',
+      headers: { ...(await this.tokenHeader()) },
+      data: JSON.stringify({ requestId: Date.now(), fileId }),
+    });
+    return result.data.localMessage as string;
+  }
 }
