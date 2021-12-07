@@ -235,4 +235,19 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
     });
     return result.data.fileUrl as string;
   }
+
+  async recheckDeliveryList(fileId: string) {
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/delivery/recheck',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({
+        fileId,
+        requestId: Date.now(),
+      }),
+    });
+    return result.data.localMessage as string;
+  }
 }
