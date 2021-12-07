@@ -34,13 +34,54 @@ type DeliveryItem = {
   fileId: string;
 };
 
+type PayoutFile = {
+  createdAt: string;
+  fileId: string;
+  fileName: string;
+  name: string;
+  partnerId: string;
+  status: PayoutStatus;
+  statusName: string;
+  totalAmount: number;
+  totalCheckAmount: number;
+  totalCheckRequest: number;
+  totalPayoutAmount: number;
+  totalPayoutRequest: number;
+  totalRequest: number;
+  userCreatedName: string;
+};
+
 export enum DeliveryStatus {
-  all = -1, // Tất cả,
-  invalid = 1, // Dữ liệu không hợp lệ
-  walled_invalid = 2, // Ví không thoả điều kiện
-  walled_not_found = 3, // Ví không tòn tại
-  valid = 4, // Có thể nhận tiền
+  /** Tất cả, */
+  all = -1,
+  /** Dữ liệu không hợp lệ */
+  invalid = 1,
+  /** Ví không thoả điều kiện */
+  walled_invalid = 2,
+  /** Ví không tòn tại */
+  walled_not_found = 3,
+  /** Có thể nhận tiền */
+  valid = 4,
 }
+
+export enum PayoutStatus {
+  /** Tất cả */
+  all = -1,
+  /** Đã khởi tạo */
+  new = 1, //
+  /** Chờ duyệt */
+  pending = 2,
+  /** Đã chi */
+  disbursed = 3,
+  /** Từ chối chi */
+  denied = 4,
+  /** Đã huỷ */
+  canceled = 5,
+  /** Hết hạn */
+  expired = 6,
+}
+
+PayoutStatus.new;
 
 export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
   private _api: AxiosInstance;
@@ -303,5 +344,34 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       resultCode: number;
       uiMessage: string;
     };
+  }
+
+  /**
+   * Láy danh sách đợt giải ngân
+   */
+  async getAllPayoutFiles(params: {
+    fromDate: string;
+    toDate: string;
+    page?: number;
+    size?: number;
+    status?: PayoutStatus;
+  }) {
+    const { fromDate, toDate, page = 1, size = 10, status = -1 } = params;
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/payout/file',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({
+        requestId: Date.now(),
+        fromDate,
+        toDate,
+        page,
+        size,
+        status,
+      }),
+    });
+    return result.data.data as PayoutFile[];
   }
 }
