@@ -51,6 +51,20 @@ type PayoutFile = {
   userCreatedName: string;
 };
 
+type PayoutItem = {
+  amount: number;
+  coreId: number;
+  extra: string;
+  fileId: string;
+  fullName: string;
+  idNumber: string;
+  lastUpdated: string;
+  payoutStatus: number;
+  phoneNumber: string;
+  status: PayoutItemStatus;
+  statusName: string;
+};
+
 export enum DeliveryStatus {
   /** Tất cả, */
   all = -1,
@@ -81,7 +95,19 @@ export enum PayoutStatus {
   expired = 6,
 }
 
-PayoutStatus.new;
+export enum PayoutItemStatus {
+  all = -1, // Tất cả
+  /** Dữ liệu không hợp lệ */
+  invalid = 1,
+  /** Ví không thoả điều kiện */
+  walled_invalid = 2,
+  /** Ví không tòn tại */
+  walled_not_found = 3,
+  /** Có thể nhận tiền */
+  valid = 4,
+  /** Không thuốc danh sách người nhận */
+  delivery_not_found = 5,
+}
 
 export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
   private _api: AxiosInstance;
@@ -391,5 +417,60 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       }),
     });
     return result.data.fileUrl as string;
+  }
+
+  /** Láy chi tiết thông tin đợt giải ngân */
+  async getPayoutFileDetail(fileId: string) {
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/payout/file/detail',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({
+        requestId: Date.now(),
+        fileId,
+      }),
+    });
+    return result.data.data as PayoutFile;
+  }
+
+  async getPayoutList(params: {
+    fileId: string;
+    page?: number;
+    size?: number;
+    status?: PayoutItemStatus;
+    coreId?: string;
+    phoneNumber?: string;
+    payoutStatus?: number;
+  }) {
+    const {
+      fileId,
+      page = 1,
+      size = 10,
+      status = -1,
+      coreId = '',
+      phoneNumber = '',
+      payoutStatus = -1,
+    } = params;
+
+    const result = await this._api({
+      method: 'post',
+      url: '/api/services/salary/v1/payout/list',
+      headers: {
+        ...(await this.tokenHeader()),
+      },
+      data: JSON.stringify({
+        requestId: Date.now(),
+        fileId,
+        page,
+        size,
+        status,
+        coreId,
+        phoneNumber,
+        payoutStatus,
+      }),
+    });
+    return result.data.data as PayoutItem[];
   }
 }
