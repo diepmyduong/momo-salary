@@ -5,7 +5,7 @@ export default test('Upload Payout List', async () => {
 
   const result = await momoSalary.uploadPayoutList(
     'assets/payout-list.xlsx',
-    'Đợt chi lương test'
+    'Đợt chi lương ' + new Date()
   );
   console.log('upload', result);
   const status = await momoSalary.getPayoutFileStatus(result.fileId);

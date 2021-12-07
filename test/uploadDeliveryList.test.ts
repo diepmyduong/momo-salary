@@ -5,7 +5,7 @@ export default test('Upload Delivery List', async () => {
 
   const result = await momoSalary.uploadDeliveryList(
     'assets/delivery-list.xlsx',
-    'danh-sach-test.xlsx'
+    `test-${new Date()}.xlsx`
   );
   console.log('upload', result);
   const status = await momoSalary.getDeliveryFileStatus(result.fileId);
