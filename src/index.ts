@@ -225,7 +225,10 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
         size,
       }),
     });
-    return result.data.data as DeliveryItem[];
+    return {
+      total: result.data.total,
+      data: result.data.data as DeliveryItem[],
+    };
   }
 
   /**
@@ -472,7 +475,10 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
         payoutStatus,
       }),
     });
-    return result.data.data as PayoutItem[];
+    return {
+      total: result.data.total,
+      data: result.data.data as PayoutItem[],
+    };
   }
 
   /** Huỷ đợt giải ngân */
