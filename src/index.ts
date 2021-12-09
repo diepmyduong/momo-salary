@@ -137,8 +137,8 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
           } else {
             throw Error(error?.response?.data?.error);
           }
-        // console.log('request', error.request);
-        throw error;
+        // console.log('request', error);
+        throw new Error(error.message);
       }
     );
     this.getToken();
