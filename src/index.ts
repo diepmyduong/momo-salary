@@ -129,7 +129,12 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
       },
     });
     this._api.interceptors.response.use(
-      response => response,
+      response => {
+        if (response.data.resultCode && response.data.resultCode != 0) {
+          throw Error(response.data.localMessage || response.data.message);
+        }
+        return response;
+      },
       error => {
         if (error?.response?.data?.error)
           if (error?.response?.data?.error.message) {
@@ -251,10 +256,13 @@ export default class MomoSalary extends TypedEmitter<MomoSalaryEvent> {
         ...data.getHeaders(),
       },
       data: concatenated,
-    }).then(
-      res =>
-        res.data.data as { fileId: string; total: number; totalSuccess: number }
-    );
+    }).then(res => {
+      return res.data.data as {
+        fileId: string;
+        total: number;
+        totalSuccess: number;
+      };
+    });
   }
 
   /**
